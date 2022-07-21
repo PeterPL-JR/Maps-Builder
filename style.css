@@ -1,0 +1,49 @@
+body {
+    background-color: #121212;
+    padding: 40px;
+}
+
+:root {
+    --inv-size: 48px;
+}
+
+canvas {
+    cursor: crosshair;
+}
+
+#container {
+    width: max-content;
+    margin: auto;
+}
+#container *::selection {
+    background-color: #0000;
+}
+
+#inventory {
+    width: max-content;
+    margin: auto;
+    margin-top: 20px;
+    cursor: crosshair;
+}
+
+.active-tile {
+    position: relative;
+    z-index: 2;
+    border-color: #8a8a8a !important;
+}
+
+.inventory-tile {
+    float: left;
+    width: var(--inv-size);
+    height: var(--inv-size);
+    
+    padding: 8px;
+    border: solid #333333 7px;
+}
+.inventory-tile:nth-child(odd) {
+    border: solid #252525 7px;
+}
+
+.inventory-tile img {
+    width: var(--inv-size);
+}
