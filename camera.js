@@ -4,6 +4,9 @@ const DEFAULT_CAMERA_Y = 0;
 const DEFAULT_ZOOM = 1;
 
 var scrollClicked = false;
+var leftClicked = false;
+var rightClicked = false;
+
 var zoom = DEFAULT_ZOOM;
 var screenTileSize = TILE_SIZE * zoom;
 var maxLinesPos = MAX_LINES * screenTileSize;
@@ -17,6 +20,9 @@ var cameraY = DEFAULT_CAMERA_Y;
 const MAX_ZOOM = 1;
 const MIN_ZOOM = 0.3;
 
+var beginTileIndex = -1;
+var endTileIndex = -1;
+
 function startMove(mouseX, mouseY) {
     scrollClicked = true;
     cameraOffsetX = cameraX - mouseX;
@@ -24,7 +30,7 @@ function startMove(mouseX, mouseY) {
 }
 
 function resetMouse() {
-    scrollClicked = false;
+    scrollClicked = leftClicked = rightClicked = false;
 
     cameraOffsetX = -1;
     cameraOffsetY = -1;

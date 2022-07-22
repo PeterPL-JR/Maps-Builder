@@ -13,13 +13,14 @@ function loadAll() {
     cameraY = parseFloat(load("camera_y"));
     
     zoom = parseFloat(load("zoom"));
-    tiles = loadTilesObj();
-
     activeTile = parseInt(load("active_tile"));
-
+    
+    tiles = loadTilesObj();
+    
     cameraX = cameraX ? cameraX : DEFAULT_CAMERA_X;
     cameraY = cameraY ? cameraY : DEFAULT_CAMERA_Y;
     zoom = zoom ? zoom : DEFAULT_ZOOM;
+    activeTile = activeTile ? activeTile : 0;
 
     screenTileSize = TILE_SIZE * zoom;
     maxLinesPos = MAX_LINES * screenTileSize;
