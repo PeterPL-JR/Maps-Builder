@@ -10,18 +10,12 @@ const INV_SIZE = 8;
 const ITEMS_WIDTH = 6;
 const ITEMS_HEIGHT = 4;
 
-const tilesNames = [
-    "grass", "floor", "wall", "stone_bricks",
-    "water", "stone_floor", "sand", "sand_bricks",
-    "flower1", "flower2", "carpet", "cactus"
-];
-
 function initInventory() {
     invDiv = document.getElementById("inventory");
     
     loadInventory();
     if(inventory == null) inventory = [];
-    
+
     if(inventory.length == 0) {   
         for(var i = 0; i < INV_SIZE; i++) {
             inventory[i] = null;

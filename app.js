@@ -207,28 +207,7 @@ function putTile(rawX, rawY) {
     if(tileType == null) return;
     
     var tile = tiles[findTileIndex(rawX, rawY)];
-    if(tile) {
-        tile.type = tileType;
-    } else {
-        var mouseX = (rawX - cameraX) / zoom;
-        var mouseY = (rawY - cameraY) / zoom;
-
-        if(mouseX < 0 || mouseY < 0) return;
-
-        var moduloX = (mouseX) % TILE_SIZE;
-        var moduloY = (mouseY) % TILE_SIZE;
-        
-        var tileX = (mouseX - moduloX) / TILE_SIZE;
-        var tileY = (mouseY - moduloY) / TILE_SIZE;
-
-        if(tileX < 0 || tileY < 0 || tileX >= MAX_LINES || tileY >= MAX_LINES) return;
-
-        tiles.push({
-            xPos: tileX,
-            yPos: tileY,
-            type: activeTile
-        });
-    }
+    tile.type = tileType
 }
 
 function removeTile(rawX, rawY) {
