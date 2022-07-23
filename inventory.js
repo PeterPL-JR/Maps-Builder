@@ -20,6 +20,8 @@ function initInventory() {
     invDiv = document.getElementById("inventory");
     
     loadInventory();
+    if(inventory == null) inventory = [];
+    
     if(inventory.length == 0) {   
         for(var i = 0; i < INV_SIZE; i++) {
             inventory[i] = null;

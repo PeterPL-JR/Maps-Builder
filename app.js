@@ -303,7 +303,7 @@ function fill() {
             var index = tiles.findIndex(function(tile) {
                 return tile.xPos == x && tile.yPos == y;
             });
-            if(fModeType == FILL_ADD_MODE) tiles[index].type = activeTile;
+            if(fModeType == FILL_ADD_MODE) tiles[index].type = inventory[activeTile];
             else if(fModeType == FILL_REMOVE_MODE) tiles[index].type = -1;
         }
     }

@@ -59,6 +59,8 @@ function loadTilesObj() {
     var array = JSON.parse(load("tiles"));
     var finalArray = [];
 
+    if(array == null) return [];
+
     for(var tile of array) {
         finalArray.push({
             xPos: tile[0],
