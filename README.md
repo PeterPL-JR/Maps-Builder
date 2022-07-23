@@ -12,7 +12,7 @@ Funkcje aplikacji:
 <li>Przewijanie (trzymanie scroll) i oddalanie/przybliżanie kamery (scroll)</li>
 <li>Kilka rodzajów kafelków oraz możliwość dodawania własnych (folder <i>tiles</i> i plik <i>tiles.js</i>)</li>
 <li>Automatyczne zapisywanie obecnego stanu mapy w pamięci localStorage</li>
-<li>Wypełnianie większych powierzchni kafelkami (trzymanie klawisza F)</li>
+<li>Wypełnianie/usuwanie większych powierzchni (klawisz F i left/right button)</li>
 <li>"Ekwipunek" z wszystkimi kafelkami (klawisz E)</li>
 </ul>
 
