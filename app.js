@@ -22,10 +22,6 @@ var rectBounds = null;
 var tiles = [];
 const images = [];
 
-const tilesNames = [
-    "grass", "wall", "floor", "sand_bricks", "water", "cactus", "flower2", "sand", "stone_floor"
-];
-
 function init() {
     loadAll();
     if(tiles.length != MAX_LINES * MAX_LINES) {
@@ -44,19 +40,33 @@ function init() {
         images.push(createImage("tiles/" + tile + ".png"));
     }
 
+    document.onkeydown = function(event) {
+        if(event.key.toUpperCase() == "E") {
+            inventoryMode = !inventoryMode;
+            invStoreDiv.style.display = inventoryMode ? "inline-block" : "none";
+        }
+        if(event.key == "Escape" && inventoryMode) {
+            inventoryMode = false;
+            invStoreDiv.style.display = "none";
+        }
+    }
     document.getElementById("container").oncontextmenu = function() {
         return false;
     }
 
     initMouse();
     initKeyboard();
+
     initInventory();
-    
+    initInventoryStore();
+
     render();
 }
 
 function initMouse() {
     canvas.onmousedown = function(event) {
+        if(inventoryMode) return;
+
         var mouseX = getMouseX(event);
         var mouseY = getMouseY(event);
 
@@ -75,6 +85,7 @@ function initMouse() {
         } 
     }
     canvas.onmouseup = function(event) {
+        if(inventoryMode) return;
         saveTilesObj();
 
         if(event.button == 0) leftClicked = false;
@@ -83,6 +94,8 @@ function initMouse() {
     }
 
     canvas.onmousemove = function(event) {
+        if(inventoryMode) return;
+
         var mouseX = getMouseX(event);
         var mouseY = getMouseY(event);
 
@@ -103,10 +116,12 @@ function initMouse() {
         }
     }
     canvas.onmouseleave = function() {
+        if(inventoryMode) return;
         resetMouse();
     }
 
     canvas.onwheel = function(event) {
+        if(inventoryMode) return;
         if(!control) {
             changeZoom(event);
         }
@@ -115,15 +130,19 @@ function initMouse() {
 
 function initKeyboard() {
     document.body.onkeydown = function(event) {
+        if(inventoryMode) return;
+
         var key = event.key.toUpperCase();
-        if(key == "A") switchInventory(activeTile - 1);
-        if(key == "D") switchInventory(activeTile + 1);
+        if(key == "A") switchInventoryItem(activeTile - 1);
+        if(key == "D") switchInventoryItem(activeTile + 1);
         if(key == "F") fMode = true;
         
-        if(!isNaN(key)) switchInventory(parseInt(key) - 1);
+        if(!isNaN(key)) switchInventoryItem(parseInt(key) - 1);
         if(event.key == "Control") control = true;
     }
     document.body.onkeyup = function(event) {
+        if(inventoryMode) return;
+
         if(event.key == "Control") control = false;
         if(event.key.toUpperCase() == "F") {
             fMode = false;
@@ -146,6 +165,11 @@ function render() {
 
     if(rectBounds != null && rectColor != null) {
         drawRect(ctx, rectBounds.xBegin, rectBounds.yBegin, rectBounds.width, rectBounds.height, rectColor, 2);
+    }
+
+    if(inventoryMode) {
+        ctx.fillStyle = "#121212bb";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
 }
 

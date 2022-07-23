@@ -1,9 +1,10 @@
 body {
-    background-color: #121212;
+    background-color: var(--color);
     padding: 40px;
 }
 
 :root {
+    --color: #121212;
     --inv-size: 48px;
 }
 
@@ -26,13 +27,15 @@ canvas {
     cursor: crosshair;
 }
 
-.active-tile {
+.active-tile,
+.store-tile-active:hover {
     position: relative;
     z-index: 2;
     border-color: #8a8a8a !important;
 }
 
-.inventory-tile {
+.inventory-tile, 
+.store-tile {
     float: left;
     width: var(--inv-size);
     height: var(--inv-size);
@@ -40,10 +43,28 @@ canvas {
     padding: 8px;
     border: solid #333333 7px;
 }
-.inventory-tile:nth-child(odd) {
+.inventory-tile:nth-child(odd), 
+.store-tile:nth-child(odd) {
     border: solid #252525 7px;
 }
 
-.inventory-tile img {
+.inventory-tile img,
+.store-tile img {
     width: var(--inv-size);
+}
+
+
+#inventory-store {
+    position: fixed;
+    width: max-content;
+    height: max-content;
+
+    background-color: #090909;
+    cursor: crosshair;
+    display: none;
+
+    top: 150px;
+    left: 0px;
+    right: 0px;
+    margin: auto;
 }
