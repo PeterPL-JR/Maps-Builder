@@ -54,12 +54,13 @@ canvas {
 }
 
 
-#inventory-store {
+#inventory-store, #save-div {
     position: fixed;
     width: max-content;
     height: max-content;
+    box-shadow: 10px 10px 1px #4e4e3a;
 
-    background-color: #090909;
+    background-color: black;
     cursor: crosshair;
     display: none;
 
@@ -67,4 +68,42 @@ canvas {
     left: 0px;
     right: 0px;
     margin: auto;
+}
+#save-div {
+    text-align: center;
+    width: 468px;
+    height: 312px;
+}
+
+input {
+    width: 300px;
+    background-color: #323232;
+    box-shadow: 3px 3px 1px #4e4e3a;
+
+    color: white;
+    font: normal 25px 'Verdana';
+    margin: 10px;
+    padding: 6px;
+    text-align: center;
+
+    margin-top: -10px;
+    margin-bottom: 20px;
+
+    outline: none;
+    border: none;
+}
+
+input:focus {
+    outline: none;
+    border: none;
+}
+
+#save-div div {
+    margin-top: 20px;
+    color: #808060;
+    font: bold 30px 'Verdana';
+}
+
+input::selection {
+    background-color: #98987e !important;
 }

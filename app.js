@@ -41,18 +41,30 @@ function init() {
     }
 
     document.onkeydown = function(event) {
-        if(event.key.toUpperCase() == "E") {
+        if(event.key.toUpperCase() == "E" && !saveMode) {
             inventoryMode = !inventoryMode;
             invStoreDiv.style.display = inventoryMode ? "inline-block" : "none";
         }
-        if(event.key == "Escape" && inventoryMode) {
+        if(event.key.toUpperCase() == "Q" && !inventoryMode) {
+            saveMode = !saveMode;
+            if(saveMode) {
+                convertTiles(tiles);
+            }
+            saveDiv.style.display = saveMode ? "inline-block" : "none";
+        }
+        if(event.key == "Escape" && (inventoryMode || saveMode)) {
             inventoryMode = false;
+            saveMode = false;
             invStoreDiv.style.display = "none";
+            saveDiv.style.display = "none";
         }
     }
     document.getElementById("container").oncontextmenu = function() {
         return false;
     }
+    saveDiv = document.getElementById("save-div");
+    tilesInput = document.getElementById("tiles-input");
+    positionsInput = document.getElementById("positions-input");
 
     initMouse();
     initKeyboard();
@@ -65,7 +77,7 @@ function init() {
 
 function initMouse() {
     canvas.onmousedown = function(event) {
-        if(inventoryMode) return;
+        if(inventoryMode || saveMode) return;
 
         var mouseX = getMouseX(event);
         var mouseY = getMouseY(event);
@@ -85,7 +97,7 @@ function initMouse() {
         } 
     }
     canvas.onmouseup = function(event) {
-        if(inventoryMode) return;
+        if(inventoryMode || saveMode) return;
         saveTilesObj();
 
         if(event.button == 0) leftClicked = false;
@@ -94,7 +106,7 @@ function initMouse() {
     }
 
     canvas.onmousemove = function(event) {
-        if(inventoryMode) return;
+        if(inventoryMode || saveMode) return;
 
         var mouseX = getMouseX(event);
         var mouseY = getMouseY(event);
@@ -116,12 +128,12 @@ function initMouse() {
         }
     }
     canvas.onmouseleave = function() {
-        if(inventoryMode) return;
+        if(inventoryMode || saveMode) return;
         resetMouse();
     }
 
     canvas.onwheel = function(event) {
-        if(inventoryMode) return;
+        if(inventoryMode || saveMode) return;
         if(!control) {
             changeZoom(event);
         }
@@ -130,7 +142,7 @@ function initMouse() {
 
 function initKeyboard() {
     document.body.onkeydown = function(event) {
-        if(inventoryMode) return;
+        if(inventoryMode || saveMode) return;
 
         var key = event.key.toUpperCase();
         if(key == "A") switchInventoryItem(activeTile - 1);
@@ -141,7 +153,7 @@ function initKeyboard() {
         if(event.key == "Control") control = true;
     }
     document.body.onkeyup = function(event) {
-        if(inventoryMode) return;
+        if(inventoryMode || saveMode) return;
 
         if(event.key == "Control") control = false;
         if(event.key.toUpperCase() == "F") {
@@ -167,8 +179,8 @@ function render() {
         drawRect(ctx, rectBounds.xBegin, rectBounds.yBegin, rectBounds.width, rectBounds.height, rectColor, 2);
     }
 
-    if(inventoryMode) {
-        ctx.fillStyle = "#121212bb";
+    if(inventoryMode || saveMode) {
+        ctx.fillStyle = "#12121277";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
 }
@@ -207,7 +219,9 @@ function putTile(rawX, rawY) {
     if(tileType == null) return;
     
     var tile = tiles[findTileIndex(rawX, rawY)];
-    tile.type = tileType
+    if(tile) {
+        tile.type = tileType;
+    }
 }
 
 function removeTile(rawX, rawY) {

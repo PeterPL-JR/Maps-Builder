@@ -1,4 +1,9 @@
 const PATH = "builder";
+var saveMode = false;
+var saveDiv;
+
+var tilesInput;
+var positionsInput;
 
 function saveAll() {
     save("camera_x", cameraX);
@@ -69,4 +74,18 @@ function loadTilesObj() {
         });
     }
     return finalArray;
+}
+
+function convertTiles(tiles) {
+    var newTiles = [];
+    for(var i = 0; i < MAX_LINES; i++) {
+        newTiles[i] = [];
+    }
+    
+    for(var tile of tiles) {
+        newTiles[tile.xPos][tile.yPos] = tile.type;
+    }
+
+    tilesInput.value = JSON.stringify(newTiles);
+    positionsInput.value = "";
 }
