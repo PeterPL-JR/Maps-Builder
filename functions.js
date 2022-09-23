@@ -72,3 +72,12 @@ function getScreenPos(coords) {
         getScreenY(coords[1])
     ];
 }
+
+function findTileIndexByPos(tilesArray, xPos, yPos) {
+    return tilesArray.findIndex(function(tile) {
+        return tile.xPos == xPos && tile.yPos == yPos;
+    });
+}
+function findTileByPos(tilesArray, xPos, yPos) {
+    return tilesArray[findTileIndexByPos(tilesArray, xPos, yPos)];
+}
