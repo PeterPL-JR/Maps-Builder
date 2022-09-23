@@ -54,7 +54,7 @@ canvas {
 }
 
 
-#inventory-store, #save-div {
+#inventory-store, #export-div, #import-div {
     position: fixed;
     width: max-content;
     height: max-content;
@@ -69,7 +69,7 @@ canvas {
     right: 0px;
     margin: auto;
 }
-#save-div {
+#export-div, #import-div {
     text-align: center;
     width: 468px;
     height: 312px;
@@ -98,12 +98,44 @@ input:focus {
     border: none;
 }
 
-#save-div div {
+#export-div div, #import-div div {
     margin-top: 20px;
     color: #808060;
     font: bold 30px 'Verdana';
 }
+#import-div input {
+    margin-bottom : 0px;
+}
 
 input::selection {
     background-color: #98987e !important;
+}
+
+#title {
+    margin-top: 40px;
+    position: fixed;
+    left: 0px;
+    width: 100%;
+    text-align: center;
+
+    color: white;
+    font: bold 40px 'Verdana';
+}
+
+button {
+    background-color: #1b1b1b;
+    box-shadow: 4px 4px 1px #76765a;
+    border: none;
+    outline: none;
+
+    color: #78785c;
+    font: bold 24px 'Verdana';
+    padding: 6px;
+    width: 120px;
+    margin-top: 28px;
+    cursor: crosshair;
+}
+button:hover {
+    box-shadow: 4px 4px 1px #b1b18e;
+    color: #9e9e7f;
 }

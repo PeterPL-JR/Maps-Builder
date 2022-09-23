@@ -1,9 +1,17 @@
 const PATH = "builder";
-var saveMode = false;
-var saveDiv;
+var exportMode = false;
+var importMode = false;
 
-var tilesInput;
-var positionsInput;
+var exportDiv;
+var importDiv;
+var title;
+var importButton;
+
+var tilesInputExport;
+var positionsInputExport;
+
+var tilesInputImport;
+var positionsInputImport;
 
 function saveAll() {
     save("camera_x", cameraX);
@@ -21,6 +29,7 @@ function loadAll() {
     activeTile = parseInt(load("active_tile"));
     
     tiles = loadTilesObj();
+    spawnTiles = loadSpawnTilesObj();
     
     cameraX = cameraX ? cameraX : DEFAULT_CAMERA_X;
     cameraY = cameraY ? cameraY : DEFAULT_CAMERA_Y;
@@ -59,7 +68,6 @@ function saveTilesObj() {
     }
     save("tiles", JSON.stringify(array));
 }
-
 function loadTilesObj() {
     var array = JSON.parse(load("tiles"));
     var finalArray = [];
@@ -76,16 +84,71 @@ function loadTilesObj() {
     return finalArray;
 }
 
-function convertTiles(tiles) {
+function saveSpawnTilesObj() {
+    save("spawn", JSON.stringify(spawnTiles));
+}
+function loadSpawnTilesObj() {
+    return JSON.parse(load("spawn"));
+}
+
+function exportData(tiles) {
     var newTiles = [];
     for(var i = 0; i < MAX_LINES; i++) {
         newTiles[i] = [];
     }
     
     for(var tile of tiles) {
-        newTiles[tile.xPos][tile.yPos] = tile.type;
+        newTiles[tile.yPos][tile.xPos] = tile.type;
     }
 
-    tilesInput.value = JSON.stringify(newTiles);
-    positionsInput.value = "";
+    var spawnPositions = [];
+    for(var index of spawnTiles) {
+        spawnPositions.push([
+            tiles[index].xPos,
+            tiles[index].yPos
+        ]);
+    }
+
+    tilesInputExport.value = JSON.stringify(newTiles);
+    positionsInputExport.value = (spawnPositions.length != 0) ? JSON.stringify(spawnPositions) : "";
+}
+
+function importData() {
+    importMode = false;
+    importDiv.style.display = "none";
+    title.innerHTML = "";
+    
+    var tilesText = tilesInputImport.value;
+    var positionsText = positionsInputImport.value;
+    
+    tilesInputImport.value = "";
+    positionsInputImport.value = "";
+
+    if(positionsText == "") positionsText = "[]";
+    if(!isJSON(tilesText) || !isJSON(positionsText)) return; 
+
+    var tilesArray = JSON.parse(tilesText);
+    if(tilesArray.length * tilesArray[0].length > MAX_LINES * MAX_LINES) return;
+    
+    var bufferTiles = [];
+    for(var y = 0; y < tilesArray.length; y++) {
+        for(var x = 0; x < tilesArray[y].length; x++) {
+            bufferTiles.push({
+                xPos: x, yPos: y,
+                type: tilesArray[y][x]
+            });
+        }
+    }
+    var positionsArrays = JSON.parse(positionsText);
+    var bufferSpawnTiles = [];
+    for(var array of positionsArrays) {
+        var tileIndex = findTileIndexByPos(array[0], array[1]);
+        bufferSpawnTiles.push(tileIndex);
+    }
+
+    tiles = bufferTiles;
+    spawnTiles = bufferSpawnTiles;
+
+    saveTilesObj();
+    saveSpawnTilesObj();
 }

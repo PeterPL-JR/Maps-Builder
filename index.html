@@ -2,17 +2,26 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Murder Mystery</title>
+    <title>Maps Builder</title>
     <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body onload="init();">
+<div id="title"></div>
+    
 <div id="container">
     <div id="inventory-store"></div>
-    <div id="save-div">
+    <div id="export-div">
         <div>Tiles</div><br>
         <input type="text" id="tiles-input" readonly><br>
         <div>Positions</div><br>
         <input type="text" id="positions-input" readonly><br>
+    </div>
+    <div id="import-div">
+        <div>Tiles</div><br>
+        <input type="text" id="tiles-input"><br>
+        <div>Positions</div><br>
+        <input type="text" id="positions-input"><br>
+        <button>Save</button>
     </div>
 
     <canvas id="canvas" width="960" height="576"></canvas>
@@ -20,11 +29,13 @@
 </div>
 
 <script src="tiles.js"></script>
+<script src="save.js"></script>
 <script src="functions.js"></script>
 <script src="inventory.js"></script>
 
 <script src="app.js"></script>
+<script src="init.js"></script>
 <script src="camera.js"></script>
-<script src="save.js"></script>
+
 </body>
 </html>

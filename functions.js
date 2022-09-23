@@ -43,3 +43,26 @@ function drawRect(ctx, x, y, width, height, color, lineWidth) {
     ctx.rect(x, y, width, height);
     ctx.stroke();
 }
+
+function isJSON(string) {
+    try {
+        JSON.parse(string);
+    } catch(e) {
+        return false;
+    }
+    return true;
+}
+
+function getScreenX(coordX) {
+    return coordX * zoom + cameraX;
+}
+function getScreenY(coordY) {
+    return coordY * zoom + cameraY;
+}
+
+function getScreenPos(coords) {
+    return [
+        getScreenX(coords[0]),
+        getScreenY(coords[1])
+    ];
+}

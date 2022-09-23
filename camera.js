@@ -10,6 +10,7 @@ var rightClicked = false;
 var zoom = DEFAULT_ZOOM;
 var screenTileSize = TILE_SIZE * zoom;
 var maxLinesPos = MAX_LINES * screenTileSize;
+const LINE_WIDTH_FACTOR = 0.8;
 
 var cameraOffsetX = -1;
 var cameraOffsetY = -1;
@@ -54,7 +55,7 @@ function changeZoom(event) {
     var startMouseY = (mouseY - cameraY) / zoom;
 
     zoom += (delta < 0) ? 0.1 : -0.1;
-    lineWidth = zoom / 2;
+    lineWidth = zoom / LINE_WIDTH_FACTOR;
     var offset = Math.sign(delta);
     
     var endMouseX = (mouseX - cameraX) / zoom;

@@ -9,159 +9,21 @@ var control = false;
 var fMode = false;
 var fModeType = -1;
 
+var zKey = false;
+var spawnTiles = [];
+
 const FILL_ADD_MODE = 0;
 const FILL_REMOVE_MODE = 1;
 
 const MAX_LINES = 40;
 var lineWidth = 0.3;
-const LINE_COLOR = "white";
+const LINE_COLOUR = "white";
 
-var rectColor = null;
+var rectColour = null;
 var rectBounds = null;
 
 var tiles = [];
 const images = [];
-
-function init() {
-    loadAll();
-    if(tiles.length != MAX_LINES * MAX_LINES) {
-        for(var x = 0; x < MAX_LINES; x++) {
-            for(var y = 0; y < MAX_LINES; y++) {
-                tiles.push({
-                    xPos: x,
-                    yPos: y,
-                    type: -1
-                });
-            }
-        }
-    }
-
-    for(var tile of tilesNames) {
-        images.push(createImage("tiles/" + tile + ".png"));
-    }
-
-    document.onkeydown = function(event) {
-        if(event.key.toUpperCase() == "E" && !saveMode) {
-            inventoryMode = !inventoryMode;
-            invStoreDiv.style.display = inventoryMode ? "inline-block" : "none";
-        }
-        if(event.key.toUpperCase() == "Q" && !inventoryMode) {
-            saveMode = !saveMode;
-            if(saveMode) {
-                convertTiles(tiles);
-            }
-            saveDiv.style.display = saveMode ? "inline-block" : "none";
-        }
-        if(event.key == "Escape" && (inventoryMode || saveMode)) {
-            inventoryMode = false;
-            saveMode = false;
-            invStoreDiv.style.display = "none";
-            saveDiv.style.display = "none";
-        }
-    }
-    document.getElementById("container").oncontextmenu = function() {
-        return false;
-    }
-    saveDiv = document.getElementById("save-div");
-    tilesInput = document.getElementById("tiles-input");
-    positionsInput = document.getElementById("positions-input");
-
-    initMouse();
-    initKeyboard();
-
-    initInventory();
-    initInventoryStore();
-
-    render();
-}
-
-function initMouse() {
-    canvas.onmousedown = function(event) {
-        if(inventoryMode || saveMode) return;
-
-        var mouseX = getMouseX(event);
-        var mouseY = getMouseY(event);
-
-        if(event.button == 0) {
-            leftClicked = true;
-            if(fMode) startFill(mouseX, mouseY);
-            else putTile(mouseX, mouseY);
-        }
-        else if(event.button == 1) {
-            startMove(mouseX, mouseY);
-        } 
-        else if(event.button == 2) {
-            rightClicked = true;
-            if(fMode) startFill(mouseX, mouseY);
-            else removeTile(mouseX, mouseY);
-        } 
-    }
-    canvas.onmouseup = function(event) {
-        if(inventoryMode || saveMode) return;
-        saveTilesObj();
-
-        if(event.button == 0) leftClicked = false;
-        else if(event.button == 1) resetMouse();
-        else if(event.button == 2) rightClicked = false;
-    }
-
-    canvas.onmousemove = function(event) {
-        if(inventoryMode || saveMode) return;
-
-        var mouseX = getMouseX(event);
-        var mouseY = getMouseY(event);
-
-        if(fMode && leftClicked) {
-            endTileIndex = findTileIndex(mouseX, mouseY);
-            fModeType = FILL_ADD_MODE;
-            updateFill();
-            
-        } else if(fMode && rightClicked) {
-            endTileIndex = findTileIndex(mouseX, mouseY);
-            fModeType = FILL_REMOVE_MODE;
-            updateFill();
-
-        } else {
-            if(leftClicked) putTile(mouseX, mouseY);
-            if(scrollClicked) moveCamera(mouseX, mouseY);
-            if(rightClicked) removeTile(mouseX, mouseY);
-        }
-    }
-    canvas.onmouseleave = function() {
-        if(inventoryMode || saveMode) return;
-        resetMouse();
-    }
-
-    canvas.onwheel = function(event) {
-        if(inventoryMode || saveMode) return;
-        if(!control) {
-            changeZoom(event);
-        }
-    }
-}
-
-function initKeyboard() {
-    document.body.onkeydown = function(event) {
-        if(inventoryMode || saveMode) return;
-
-        var key = event.key.toUpperCase();
-        if(key == "A") switchInventoryItem(activeTile - 1);
-        if(key == "D") switchInventoryItem(activeTile + 1);
-        if(key == "F") fMode = true;
-        
-        if(!isNaN(key)) switchInventoryItem(parseInt(key) - 1);
-        if(event.key == "Control") control = true;
-    }
-    document.body.onkeyup = function(event) {
-        if(inventoryMode || saveMode) return;
-
-        if(event.key == "Control") control = false;
-        if(event.key.toUpperCase() == "F") {
-            fMode = false;
-            rectBounds = null;
-        }
-    }
-}
 
 function render() {
     requestAnimationFrame(render);
@@ -170,16 +32,21 @@ function render() {
 
     renderLines();
     renderTiles();
+    
+    for(var index of spawnTiles) {
+        var pos = getTileScreenPos(tiles[index]);
+        drawRect(ctx, pos.xPos, pos.yPos, screenTileSize, screenTileSize, "red", lineWidth * 2);
+    }
 
     if(!(fMode && (leftClicked || rightClicked))) {
         resetFill();
     }
 
-    if(rectBounds != null && rectColor != null) {
-        drawRect(ctx, rectBounds.xBegin, rectBounds.yBegin, rectBounds.width, rectBounds.height, rectColor, 2);
+    if(rectBounds != null && rectColour != null) {
+        drawRect(ctx, rectBounds.xBegin, rectBounds.yBegin, rectBounds.width, rectBounds.height, rectColour, 2);
     }
 
-    if(inventoryMode || saveMode) {
+    if(inventoryMode || exportMode || importMode) {
         ctx.fillStyle = "#12121277";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
@@ -193,17 +60,31 @@ function renderLines() {
     for(var x = 0; x < linesInWidth; x++) {
         var xScreenPos = beginX + x * screenTileSize;
         var xPos = xScreenPos - cameraX;
-
         if(xPos < -1 || xPos > maxLinesPos) continue;
-        drawLine(ctx, xScreenPos, cameraY - lineWidth, xScreenPos, maxLinesPos + cameraY - lineWidth, LINE_COLOR, lineWidth);
+        drawLine(ctx, xScreenPos, cameraY - lineWidth, xScreenPos, maxLinesPos + cameraY - lineWidth, LINE_COLOUR, lineWidth);
     }
     var beginY = Math.floor(cameraY % screenTileSize);
     for(var y = 0; y < linesInHeight; y++) {
         var yScreenPos = beginY + y * screenTileSize;
         var yPos = yScreenPos - cameraY;
         if(yPos < -1 || yPos > maxLinesPos) continue;
-        drawLine(ctx, cameraX + lineWidth, yScreenPos, maxLinesPos + cameraX - lineWidth, yScreenPos, LINE_COLOR, lineWidth);
+        drawLine(ctx, cameraX + lineWidth, yScreenPos, maxLinesPos + cameraX - lineWidth, yScreenPos, LINE_COLOUR, lineWidth);
     }
+    drawCentralLines();
+}
+
+function drawCentralLines() {
+    var beginX = getScreenX(0);
+    var beginY = getScreenY(0);
+
+    var endX = getScreenX(MAX_LINES * TILE_SIZE);
+    var endY = getScreenY(MAX_LINES * TILE_SIZE);
+
+    var lineX = getScreenX(MAX_LINES * TILE_SIZE / 2);
+    var lineY = getScreenY(MAX_LINES * TILE_SIZE / 2);
+
+    drawLine(ctx, lineX, beginY, lineX, endY, LINE_COLOUR, lineWidth * 2);
+    drawLine(ctx, beginX, lineY, endX, lineY, LINE_COLOUR, lineWidth * 2);
 }
 
 function renderTiles() {
@@ -240,7 +121,7 @@ function resetFill() {
         fill();
     }
     beginTileIndex = endTileIndex = -1;
-    rectColor = rectBounds = null;
+    rectColour = rectBounds = null;
     fModeType = -1;
 }
 
@@ -271,7 +152,7 @@ function updateFill() {
         yEnd = buffer;
     }
 
-    rectColor = (fModeType == 0) ? "#00ff00" : "#ff0000";
+    rectColour = (fModeType == 0) ? "#00ff00" : "#ff0000";
     rectBounds = {
         xBegin: xBegin,
         yBegin: yBegin,
@@ -293,9 +174,7 @@ function fill() {
 
     for(var x = begin.xPos; x < end.xPos; x++) {
         for(var y = begin.yPos; y < end.yPos; y++) {
-            var index = tiles.findIndex(function(tile) {
-                return tile.xPos == x && tile.yPos == y;
-            });
+            var index = findTileIndexByPos(x, y);
             if(fModeType == FILL_ADD_MODE) tiles[index].type = inventory[activeTile];
             else if(fModeType == FILL_REMOVE_MODE) tiles[index].type = -1;
         }
@@ -303,13 +182,31 @@ function fill() {
     saveTilesObj();
 }
 
+function getPos(rawX, rawY) {
+    var tileIndex = findTileIndex(rawX, rawY);
+    var tile = tiles[tileIndex];
+
+    if(spawnTiles.indexOf(tileIndex) == -1) spawnTiles.push(tileIndex);
+    else {
+        var indexInArray = spawnTiles.indexOf(tileIndex);
+        spawnTiles.splice(indexInArray, 1);
+    }
+    saveSpawnTilesObj();
+}
+
 function findTileIndex(rawX, rawY) {
     var mouseX = (rawX - cameraX) / zoom;
     var mouseY = (rawY - cameraY) / zoom;
-
+    
     return tiles.findIndex(function(tile) {
         var condX = mouseX > tile.xPos * TILE_SIZE && mouseX < tile.xPos * TILE_SIZE + TILE_SIZE;
         var condY = mouseY > tile.yPos * TILE_SIZE && mouseY < tile.yPos * TILE_SIZE + TILE_SIZE;
         return condX && condY;
+    });
+}
+
+function findTileIndexByPos(xPos, yPos) {
+    return tiles.findIndex(function(tile) {
+        return tile.xPos == xPos && tile.yPos == yPos;
     });
 }
