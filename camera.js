@@ -9,8 +9,10 @@ var rightClicked = false;
 
 var zoom = DEFAULT_ZOOM;
 var screenTileSize = TILE_SIZE * zoom;
-var maxLinesPos = MAX_LINES * screenTileSize;
 const LINE_WIDTH_FACTOR = 0.8;
+
+var maxLinesX = mapWidth * screenTileSize;
+var maxLinesY = mapHeight * screenTileSize;
 
 var cameraOffsetX = -1;
 var cameraOffsetY = -1;
@@ -48,6 +50,9 @@ function moveCamera(mouseX, mouseY) {
 function changeZoom(event) {
     var delta = event.deltaY;
 
+    const MAX_DELTA_ABSOLUTE_VALUE = 150;
+    if(Math.abs(delta) >= MAX_DELTA_ABSOLUTE_VALUE) return;
+
     var mouseX = getMouseX(event);
     var mouseY = getMouseY(event);
 
@@ -77,6 +82,11 @@ function changeZoom(event) {
     cameraY += yDif * zoom * offset;
 
     screenTileSize = TILE_SIZE * zoom;
-    maxLinesPos = MAX_LINES * screenTileSize;
+    changeMaxLinesPos();
     saveAll();
+}
+
+function changeMaxLinesPos() {
+    maxLinesX = mapWidth * screenTileSize;
+    maxLinesY = mapHeight * screenTileSize;
 }

@@ -1,6 +1,7 @@
 const INV_MODE_TEXT = "Tiles";
 const EXPORT_MODE_TEXT = "Export";
 const IMPORT_MODE_TEXT = "Import";
+const RESIZE_MODE_TEXT = "Map Size";
 
 function init() {
     loadAll();
@@ -15,27 +16,24 @@ function init() {
     }
     exportDiv = document.getElementById("export-div");
     importDiv = document.getElementById("import-div");
-
+    resizeDiv = document.getElementById("resize-div");
+    
     tilesInputExport = document.querySelector("#export-div #tiles-input");
     positionsInputExport = document.querySelector("#export-div #positions-input");
-
+    
     tilesInputImport = document.querySelector("#import-div #tiles-input");
     positionsInputImport = document.querySelector("#import-div #positions-input");
     
     title = document.getElementById("title");
+    
+    importButton = importDiv.querySelector("button");
+    importButton.onclick = importData;
+    
+    resizeButton = resizeDiv.querySelector("button");
+    resizeButton.onclick = resizeButtonEvent;
 
-    importButton = document.querySelector("#import-div button");
-    importButton.onclick = function() {
-        importData();
-    }
-
-    if (tiles.length != MAX_LINES * MAX_LINES) {
-        for (var x = 0; x < MAX_LINES; x++) {
-            for (var y = 0; y < MAX_LINES; y++) {
-                tiles.push({ xPos: x, yPos: y, type: -1 });
-            }
-        }
-    }
+    widthInput = resizeDiv.querySelector("#width-input");
+    heightInput = resizeDiv.querySelector("#height-input");
 
     initMouse();
     initKeyboard();
@@ -119,13 +117,16 @@ function initKeyboard() {
         var key = event.key.toUpperCase();
         if (importMode || key == " ") return;
 
-        if (key == "A") switchInventoryItem(activeTile - 1);
-        if (key == "D") switchInventoryItem(activeTile + 1);
-        if (key == "F") fMode = true;
-        if (key == "Z") zKey = true;
-        
-        if (!isNaN(key)) switchInventoryItem(parseInt(key) - 1);
-        if (event.key == "Control") control = true;
+        if(!resizeMode) {
+
+            if (key == "A") switchInventoryItem(activeTile - 1);
+            if (key == "D") switchInventoryItem(activeTile + 1);
+            if (key == "F") fMode = true;
+            if (key == "Z") zKey = true;
+            
+            if (!isNaN(key)) switchInventoryItem(parseInt(key) - 1);
+            if (event.key == "Control") control = true;
+        }
     }
     document.body.onkeyup = function (event) {
         if (inventoryMode || exportMode) return;
@@ -141,37 +142,65 @@ function initKeyboard() {
     }
 
     document.onkeydown = function (event) {
-        if (event.key.toUpperCase() == "Q" && !exportMode && !importMode) {
+        const key = event.key.toUpperCase();
+
+        if (key == "Q" && !exportMode && !importMode && !resizeMode) {
             inventoryMode = !inventoryMode;
             invStoreDiv.style.display = inventoryMode ? "inline-block" : "none";
         }
-        if (event.key.toUpperCase() == "E" && !inventoryMode && !importMode) {
+        if (key == "E" && !inventoryMode && !importMode && !resizeMode) {
             exportMode = !exportMode;
             if (exportMode) {
                 exportData(tiles);
             }
             exportDiv.style.display = exportMode ? "inline-block" : "none";
         }
-        if (event.key.toUpperCase() == "I" && !inventoryMode && !exportMode) {
+        if (key == "I" && !inventoryMode && !exportMode && !resizeMode) {
             importMode = !importMode;
             importDiv.style.display = importMode ? "inline-block" : "none";
         }
-        if (event.key == "Escape" && (inventoryMode || exportMode || importMode)) {
+        if (key == "R" && !inventoryMode && !exportMode && !importMode) {
+            resizeMode = !resizeMode;
+            if(resizeMode) {
+                widthInput.value = mapWidth;
+                heightInput.value = mapHeight;
+            }
+            resizeDiv.style.display = resizeMode ? "inline-block" : "none";
+        }
+        if (key == "ESCAPE" && (inventoryMode || exportMode || importMode || resizeMode)) {
             inventoryMode = false;
             exportMode = false;
             importMode = false;
+            resizeMode = false;
 
             invStoreDiv.style.display = "none";
             exportDiv.style.display = "none";
             importDiv.style.display = "none";
-
+            resizeDiv.style.display = "none"
+            
             title.innerHTML = "";
         }
 
         if (inventoryMode) title.innerHTML = INV_MODE_TEXT;
         if (exportMode) title.innerHTML = EXPORT_MODE_TEXT;
         if (importMode) title.innerHTML = IMPORT_MODE_TEXT;
+        if (resizeMode) title.innerHTML = RESIZE_MODE_TEXT;
 
-        if (!(inventoryMode || exportMode || importMode)) title.innerHTML = "";
+        if (!(inventoryMode || exportMode || importMode || resizeMode)) title.innerHTML = "";
     }
+}
+
+function getEmptyTilesArray(width, height) {
+    const array = [];
+
+    for(var x = 0; x < width; x++) {
+        for(var y = 0; y < height; y++) {
+            array.push({
+                xPos: x,
+                yPos: y,
+                type: -1
+            });
+        }
+    }
+    return array;
 }

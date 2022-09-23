@@ -54,7 +54,7 @@ canvas {
 }
 
 
-#inventory-store, #export-div, #import-div {
+#inventory-store, #export-div, #import-div, #resize-div {
     position: fixed;
     width: max-content;
     height: max-content;
@@ -69,7 +69,7 @@ canvas {
     right: 0px;
     margin: auto;
 }
-#export-div, #import-div {
+#export-div, #import-div, #resize-div {
     text-align: center;
     width: 468px;
     height: 312px;
@@ -98,12 +98,12 @@ input:focus {
     border: none;
 }
 
-#export-div div, #import-div div {
+#export-div div, #import-div div, #resize-div div {
     margin-top: 20px;
     color: #808060;
     font: bold 30px 'Verdana';
 }
-#import-div input {
+#import-div input, #resize-div input {
     margin-bottom : 0px;
 }
 
@@ -138,4 +138,17 @@ button {
 button:hover {
     box-shadow: 4px 4px 1px #b1b18e;
     color: #9e9e7f;
+}
+
+#resize-div input {
+    width: 240px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+	margin: 0;
+}
+input[type=number] {
+	-moz-appearance: textfield;
 }

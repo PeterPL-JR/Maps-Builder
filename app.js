@@ -5,6 +5,9 @@ const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const TILE_SIZE = 96;
 
+const MIN_MAP_SIZE = 2;
+const MAX_MAP_SIZE = 50;
+
 var control = false;
 var fMode = false;
 var fModeType = -1;
@@ -15,7 +18,10 @@ var spawnTiles = [];
 const FILL_ADD_MODE = 0;
 const FILL_REMOVE_MODE = 1;
 
-const MAX_LINES = 40;
+const DEFAULT_MAP_SIZE = 40;
+var mapWidth = DEFAULT_MAP_SIZE;
+var mapHeight = DEFAULT_MAP_SIZE;
+
 var lineWidth = 0.3;
 const LINE_COLOUR = "white";
 
@@ -46,7 +52,7 @@ function render() {
         drawRect(ctx, rectBounds.xBegin, rectBounds.yBegin, rectBounds.width, rectBounds.height, rectColour, 2);
     }
 
-    if(inventoryMode || exportMode || importMode) {
+    if(inventoryMode || exportMode || importMode || resizeMode) {
         ctx.fillStyle = "#12121277";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
@@ -60,15 +66,15 @@ function renderLines() {
     for(var x = 0; x < linesInWidth; x++) {
         var xScreenPos = beginX + x * screenTileSize;
         var xPos = xScreenPos - cameraX;
-        if(xPos < -1 || xPos > maxLinesPos) continue;
-        drawLine(ctx, xScreenPos, cameraY - lineWidth, xScreenPos, maxLinesPos + cameraY - lineWidth, LINE_COLOUR, lineWidth);
+        if(xPos < -1 || xPos > maxLinesX) continue;
+        drawLine(ctx, xScreenPos, cameraY - lineWidth, xScreenPos, maxLinesY + cameraY - lineWidth, LINE_COLOUR, lineWidth);
     }
     var beginY = Math.floor(cameraY % screenTileSize);
     for(var y = 0; y < linesInHeight; y++) {
         var yScreenPos = beginY + y * screenTileSize;
         var yPos = yScreenPos - cameraY;
-        if(yPos < -1 || yPos > maxLinesPos) continue;
-        drawLine(ctx, cameraX + lineWidth, yScreenPos, maxLinesPos + cameraX - lineWidth, yScreenPos, LINE_COLOUR, lineWidth);
+        if(yPos < -1 || yPos > maxLinesY) continue;
+        drawLine(ctx, cameraX + lineWidth, yScreenPos, maxLinesX + cameraX - lineWidth, yScreenPos, LINE_COLOUR, lineWidth);
     }
     drawCentralLines();
 }
@@ -77,11 +83,11 @@ function drawCentralLines() {
     var beginX = getScreenX(0);
     var beginY = getScreenY(0);
 
-    var endX = getScreenX(MAX_LINES * TILE_SIZE);
-    var endY = getScreenY(MAX_LINES * TILE_SIZE);
+    var endX = getScreenX(mapWidth * TILE_SIZE);
+    var endY = getScreenY(mapHeight * TILE_SIZE);
 
-    var lineX = getScreenX(MAX_LINES * TILE_SIZE / 2);
-    var lineY = getScreenY(MAX_LINES * TILE_SIZE / 2);
+    var lineX = getScreenX(mapWidth * TILE_SIZE / 2);
+    var lineY = getScreenY(mapHeight * TILE_SIZE / 2);
 
     drawLine(ctx, lineX, beginY, lineX, endY, LINE_COLOUR, lineWidth * 2);
     drawLine(ctx, beginX, lineY, endX, lineY, LINE_COLOUR, lineWidth * 2);
@@ -174,7 +180,7 @@ function fill() {
 
     for(var x = begin.xPos; x < end.xPos; x++) {
         for(var y = begin.yPos; y < end.yPos; y++) {
-            var index = findTileIndexByPos(x, y);
+            var index = findTileIndexByPos(tiles, x, y);
             if(fModeType == FILL_ADD_MODE) tiles[index].type = inventory[activeTile];
             else if(fModeType == FILL_REMOVE_MODE) tiles[index].type = -1;
         }
@@ -184,7 +190,6 @@ function fill() {
 
 function getPos(rawX, rawY) {
     var tileIndex = findTileIndex(rawX, rawY);
-    var tile = tiles[tileIndex];
 
     if(spawnTiles.indexOf(tileIndex) == -1) spawnTiles.push(tileIndex);
     else {
@@ -192,6 +197,26 @@ function getPos(rawX, rawY) {
         spawnTiles.splice(indexInArray, 1);
     }
     saveSpawnTilesObj();
+}
+
+function resizeMap(width, height) {
+    var array = getEmptyTilesArray(width, height);
+    for(var oldTile of tiles) {
+        const x = oldTile.xPos;
+        const y = oldTile.yPos;
+        const type = oldTile.type;
+
+        if(x >= width || y >= height) continue;
+        findTileByPos(array, x, y).type = type;
+    }
+    
+    mapWidth = width;
+    mapHeight = height;
+    tiles = array;
+
+    changeMaxLinesPos();
+    saveTilesObj();
+    saveAll();
 }
 
 function findTileIndex(rawX, rawY) {
@@ -205,8 +230,11 @@ function findTileIndex(rawX, rawY) {
     });
 }
 
-function findTileIndexByPos(xPos, yPos) {
-    return tiles.findIndex(function(tile) {
+function findTileIndexByPos(tilesArray, xPos, yPos) {
+    return tilesArray.findIndex(function(tile) {
         return tile.xPos == xPos && tile.yPos == yPos;
     });
+}
+function findTileByPos(tilesArray, xPos, yPos) {
+    return tilesArray[findTileIndexByPos(tilesArray, xPos, yPos)];
 }
