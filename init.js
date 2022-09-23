@@ -5,8 +5,9 @@ const IMPORT_MODE_TEXT = "Import";
 function init() {
     loadAll();
 
-    for(var tile of tilesNames) {
-        images.push(createImage("tiles/" + tile + ".png"));
+    for(var tile of tilesObjects) {
+        images[tile.index] = createImage("tiles/" + tile.tile + ".png");
+        tilesNames[tile.index] = tile.tile;
     }
 
     document.getElementById("container").oncontextmenu = function () {

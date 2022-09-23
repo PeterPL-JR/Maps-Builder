@@ -1,5 +1,6 @@
 var inventory = [];
 var tilesDivs = [];
+const tilesNames = [];
 
 var invDiv;
 var invStoreDiv;
