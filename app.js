@@ -49,6 +49,11 @@ function render() {
     }
 
     if(rectBounds != null && rectColour != null) {
+        const bounds = getFillBounds(rectBounds);
+        const width = bounds.end.xPos - bounds.begin.xPos;
+        const height = bounds.end.yPos - bounds.begin.yPos;
+
+        drawText(ctx, rectBounds.xBegin + 10, rectBounds.yBegin - 10, `${width}x${height}`, rectColour, "30px Verdana");
         drawRect(ctx, rectBounds.xBegin, rectBounds.yBegin, rectBounds.width, rectBounds.height, rectColour, 2);
     }
 
@@ -169,6 +174,19 @@ function updateFill() {
 }
 
 function fill() {
+    const bounds = getFillBounds(rectBounds);
+
+    for(var x = bounds.begin.xPos; x < bounds.end.xPos; x++) {
+        for(var y = bounds.begin.yPos; y < bounds.end.yPos; y++) {
+            var index = findTileIndexByPos(tiles, x, y);
+            if(fModeType == FILL_ADD_MODE) tiles[index].type = inventory[activeTile];
+            else if(fModeType == FILL_REMOVE_MODE) tiles[index].type = -1;
+        }
+    }
+    saveTilesObj();
+}
+
+function getFillBounds(rectBounds) {
     var xBeginRaw = rectBounds.xBegin;
     var yBeginRaw = rectBounds.yBegin;
 
@@ -178,14 +196,7 @@ function fill() {
     var begin = getTilePos(xBeginRaw, yBeginRaw);
     var end = getTilePos(xEndRaw, yEndRaw);
 
-    for(var x = begin.xPos; x < end.xPos; x++) {
-        for(var y = begin.yPos; y < end.yPos; y++) {
-            var index = findTileIndexByPos(tiles, x, y);
-            if(fModeType == FILL_ADD_MODE) tiles[index].type = inventory[activeTile];
-            else if(fModeType == FILL_REMOVE_MODE) tiles[index].type = -1;
-        }
-    }
-    saveTilesObj();
+    return {begin, end};
 }
 
 function getPos(rawX, rawY) {

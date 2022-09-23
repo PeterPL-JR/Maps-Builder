@@ -44,6 +44,12 @@ function drawRect(ctx, x, y, width, height, color, lineWidth) {
     ctx.stroke();
 }
 
+function drawText(ctx, x, y, string, color, font) {
+    ctx.fillStyle = color;
+    ctx.font = font;
+    ctx.fillText(string, x, y);
+}
+
 function isJSON(string) {
     try {
         JSON.parse(string);
