@@ -104,14 +104,14 @@ function getFillBounds(rectBounds) {
 }
 
 function putSpawnTile(rawX, rawY) {
+    modifySpawn();
     var tileIndex = findTileIndex(rawX, rawY);
-
+    
     if(spawnTiles.indexOf(tileIndex) == -1) spawnTiles.push(tileIndex);
     else {
         var indexInArray = spawnTiles.indexOf(tileIndex);
         spawnTiles.splice(indexInArray, 1);
     }
-    modifySpawn();
     saveSpawnTilesObj();
 }
 
@@ -130,9 +130,7 @@ function resizeMap(width, height) {
     mapHeight = height;
     tiles = array;
     
-    modifyMapDimension();
     changeMaxLinesPos();
-
     saveTilesObj();
     saveAll();
 }
