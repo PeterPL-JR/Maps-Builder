@@ -79,6 +79,10 @@ function initKeyboard() {
     }
 }
 
+function canEdit() {
+    return !(inventoryMode || exportMode || importMode || resizeMode);
+}
+
 function getEmptyTilesArray(width, height) {
     const array = [];
 

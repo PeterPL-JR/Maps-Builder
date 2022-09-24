@@ -1,12 +1,12 @@
 function putTile(rawX, rawY) {
-    const tileType = inventory[activeTile];
-    if(tileType == null) return;
+    const newtileType = inventory[activeTile];
+    if(newtileType == null) return;
     
     var tile = tiles[findTileIndex(rawX, rawY)];
-    if(tile && tile.type != tileType) {
-        tile.type = tileType;
+    if(tile && tile.type != newtileType) {
+        modifyTile(tile.xPos, tile.yPos, tile.type, newtileType);
+        tile.type = newtileType;
     }
-    // put into history
 }
 
 function removeTile(rawX, rawY) {
@@ -14,9 +14,9 @@ function removeTile(rawX, rawY) {
     const tile = tiles[index];
     
     if(index != -1 && tile.type != -1) {
+        modifyTile(tile.xPos, tile.yPos, tile.type, -1);
         tile.type = -1;
     }
-    // put into history
 }
 
 function startFill(mouseX, mouseY) {
@@ -75,12 +75,19 @@ function fill() {
     for(var x = bounds.begin.xPos; x < bounds.end.xPos; x++) {
         for(var y = bounds.begin.yPos; y < bounds.end.yPos; y++) {
             var index = findTileIndexByPos(tiles, x, y);
-            if(fModeType == FILL_ADD_MODE) tiles[index].type = inventory[activeTile];
-            else if(fModeType == FILL_REMOVE_MODE) tiles[index].type = -1;
+            const tile = tiles[index];
+
+            if(fModeType == FILL_ADD_MODE) var newTileType = inventory[activeTile];
+            if(fModeType == FILL_REMOVE_MODE) var newTileType = -1;
+
+            if(tile.type != newTileType) {
+                modifyTile(x, y, tile.type, newTileType);
+                tile.type = newTileType;
+            }
         }
     }
+    putIntoHistory();
     saveTilesObj();
-    // put into history
 }
 
 function getFillBounds(rectBounds) {
@@ -94,6 +101,18 @@ function getFillBounds(rectBounds) {
     var end = getTilePos(xEndRaw, yEndRaw);
 
     return {begin, end};
+}
+
+function putSpawnTile(rawX, rawY) {
+    var tileIndex = findTileIndex(rawX, rawY);
+
+    if(spawnTiles.indexOf(tileIndex) == -1) spawnTiles.push(tileIndex);
+    else {
+        var indexInArray = spawnTiles.indexOf(tileIndex);
+        spawnTiles.splice(indexInArray, 1);
+    }
+    modifySpawn();
+    saveSpawnTilesObj();
 }
 
 function resizeMap(width, height) {
@@ -110,8 +129,10 @@ function resizeMap(width, height) {
     mapWidth = width;
     mapHeight = height;
     tiles = array;
-
+    
+    modifyMapDimension();
     changeMaxLinesPos();
+    
     saveTilesObj();
     saveAll();
 }

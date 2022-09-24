@@ -12,7 +12,6 @@ var control = false;
 var fMode = false;
 var fModeType = -1;
 
-var zKey = false;
 var spawnTiles = [];
 
 const FILL_ADD_MODE = 0;
@@ -102,19 +101,10 @@ function renderTiles() {
     for(var tile of tiles) {
         var pos = getTileScreenPos(tile);
         if(tile.type == -1) continue;
+
+        ctx.imageSmoothingEnabled = false;
         ctx.drawImage(images[tile.type], pos.xPos, pos.yPos, screenTileSize, screenTileSize);
     }
-}
-
-function getPos(rawX, rawY) {
-    var tileIndex = findTileIndex(rawX, rawY);
-
-    if(spawnTiles.indexOf(tileIndex) == -1) spawnTiles.push(tileIndex);
-    else {
-        var indexInArray = spawnTiles.indexOf(tileIndex);
-        spawnTiles.splice(indexInArray, 1);
-    }
-    saveSpawnTilesObj();
 }
 
 function findTileIndex(rawX, rawY) {

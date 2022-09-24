@@ -9,8 +9,14 @@ const _KEY_EXPORT_MENU = "E";
 const _KEY_IMPORT_MENU = "I";
 const _KEY_RESIZE_MENU = "R";
 
+const _KEY_UNDO = "Z";
+const _KEY_REDO = "Y";
+
+var zKey = false;
+var yKey = false;
+
 function keyDown(event) {
-    if (inventoryMode || exportMode) return;
+    if (!canEdit()) return;
 
     var key = event.key.toUpperCase();
     if (importMode || key == " ") return;
@@ -20,18 +26,27 @@ function keyDown(event) {
         if (key == _KEY_SWITCH_INV_LEFT) switchInventoryItem(activeTile - 1);
         if (key == _KEY_SWITCH_INV_RIGHT) switchInventoryItem(activeTile + 1);
         if (key == _KEY_FILLING_MODE) fMode = true;
-        if (key == _KEY_SPAWN_ADDING_MODE) zKey = true;
+
+        if (key == _KEY_SPAWN_ADDING_MODE || key == _KEY_UNDO) zKey = true;
+        if (key == _KEY_REDO) yKey = true;
 
         if (!isNaN(key)) switchInventoryItem(parseInt(key) - 1);
         if (event.key == "Control") control = true;
     }
+    if(control && zKey && !yKey) {
+        undo();
+    }
+    if(control && yKey && !zKey) {
+        redo();
+    }
 }
 
 function keyUp(event) {
-    if (inventoryMode || exportMode) return;
+    if (!canEdit()) return;
 
     var key = event.key.toUpperCase();
-    if (key == _KEY_SPAWN_ADDING_MODE) zKey = false;
+    if (key == _KEY_SPAWN_ADDING_MODE || key == _KEY_UNDO) zKey = false;
+    if (key == _KEY_REDO) yKey = false;
 
     if (event.key == "Control") control = false;
     if (event.key.toUpperCase() == _KEY_FILLING_MODE) {
@@ -48,14 +63,14 @@ function keyDownDoc(event) {
     if (key == _KEY_EXPORT_MENU && !inventoryMode && !importMode && !resizeMode) keyExportEvent();
     if (key == _KEY_IMPORT_MENU && !inventoryMode && !exportMode && !resizeMode) keyImportEvent();
 
-    if (key == "ESCAPE" && (inventoryMode || exportMode || importMode || resizeMode)) escape();
+    if (key == "ESCAPE" && !canEdit()) escape();
 
     if (inventoryMode) title.innerHTML = INV_MODE_TEXT;
     if (exportMode) title.innerHTML = EXPORT_MODE_TEXT;
     if (importMode) title.innerHTML = IMPORT_MODE_TEXT;
     if (resizeMode) title.innerHTML = RESIZE_MODE_TEXT;
 
-    if (!(inventoryMode || exportMode || importMode || resizeMode)) title.innerHTML = "";
+    if (canEdit()) title.innerHTML = "";
 }
 
 function keyInventoryEvent() {

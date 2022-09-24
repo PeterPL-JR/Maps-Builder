@@ -3,7 +3,7 @@ const MIDDLE_BUTTON = 1;
 const RIGHT_BUTTON = 2;
 
 function mouseDown(event) {
-    if (inventoryMode || exportMode) return;
+    if (!canEdit()) return;
 
     var mouseX = getMouseX(event);
     var mouseY = getMouseY(event);
@@ -14,7 +14,7 @@ function mouseDown(event) {
         else putTile(mouseX, mouseY);
     }
     else if (event.button == MIDDLE_BUTTON) {
-        if (zKey) getPos(mouseX, mouseY);
+        if (zKey) putSpawnTile(mouseX, mouseY);
         else startMove(mouseX, mouseY);
     }
     else if (event.button == RIGHT_BUTTON) {
@@ -25,16 +25,18 @@ function mouseDown(event) {
 }
 
 function mouseUp(event) {
-    if (inventoryMode || exportMode) return;
+    if (!canEdit()) return;
     saveTilesObj();
 
     if (event.button == LEFT_BUTTON) leftClicked = false;
     else if (event.button == MIDDLE_BUTTON) resetMouse();
     else if (event.button == RIGHT_BUTTON) rightClicked = false;
+
+    if((!leftClicked || !rightClicked) && !fMode) putIntoHistory();
 }
 
 function mouseMove(event) {
-    if (inventoryMode || exportMode) return;
+    if (!canEdit()) return;
 
     var mouseX = getMouseX(event);
     var mouseY = getMouseY(event);
@@ -57,12 +59,12 @@ function mouseMove(event) {
 }
 
 function mouseLeave() {
-    if (inventoryMode || exportMode) return;
+    if (!canEdit()) return;
     resetMouse();
 }
 
 function mouseWheel(event) {
-    if (inventoryMode || exportMode) return;
+    if (!canEdit()) return;
     if (!control) {
         changeZoom(event);
     }
