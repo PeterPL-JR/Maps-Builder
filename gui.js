@@ -69,7 +69,10 @@ function resizeButtonEvent() {
     var height = parseInt(heightInput.value);
     
     if(!isNaN(width) && !isNaN(height) && width >= MIN_MAP_SIZE && width <= MAX_MAP_SIZE && height >= MIN_MAP_SIZE && height <= MAX_MAP_SIZE) {
-        modifyMapDimension();
+        if(width < mapWidth || height < mapHeight) {
+            var removedTiles = [];
+        }
+        modifyMapDimension({width: mapWidth, height: mapHeight}, {width, height}, removedTiles);
         resizeMap(width, height);
     }
 }

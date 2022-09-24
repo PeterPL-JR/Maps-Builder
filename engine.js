@@ -104,7 +104,7 @@ function getFillBounds(rectBounds) {
 }
 
 function putSpawnTile(rawX, rawY) {
-    modifySpawn();
+    const oldSpawn = Array.from(spawnTiles);
     var tileIndex = findTileIndex(rawX, rawY);
     
     if(spawnTiles.indexOf(tileIndex) == -1) spawnTiles.push(tileIndex);
@@ -112,6 +112,7 @@ function putSpawnTile(rawX, rawY) {
         var indexInArray = spawnTiles.indexOf(tileIndex);
         spawnTiles.splice(indexInArray, 1);
     }
+    modifySpawn(oldSpawn, Array.from(spawnTiles));
     saveSpawnTilesObj();
 }
 

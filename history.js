@@ -12,11 +12,11 @@ const REDO = 1;
 function modifyTile(x, y, oldType, newType) {
     lastModifiedTiles.push({xPos: x, yPos: y, oldType, newType});
 }
-function modifySpawn() {
-    // putIntoHistory(EDIT_SPAWN, Array.from(spawnTiles));
+function modifySpawn(oldSpawn, newSpawn) {
+    putIntoHistory(EDIT_SPAWN, {oldSpawn, newSpawn});
 }
-function modifyMapDimension() {
-    // putIntoHistory(EDIT_DIMENSION, {width: mapWidth, height: mapHeight});
+function modifyMapDimension(oldData, newData, removedTiles) {
+    putIntoHistory(EDIT_DIMENSION, {oldData, newData, removedTiles});
 }
 
 const ZERO = 0;
@@ -51,11 +51,21 @@ function setHistoryPoint(action) {
         saveTilesObj();
     }
     if(point.action == EDIT_SPAWN) {
-        spawnTiles = point.data;
+        if(action == UNDO) spawnTiles = point.data.oldSpawn;
+        if(action == REDO) spawnTiles = point.data.newSpawn;
         saveSpawnTilesObj();
     }
     if(point.action == EDIT_DIMENSION) {
-        resizeMap(point.data.width, point.data.height);
+        if(action == UNDO) var data = point.data.oldData;
+        if(action == REDO) var data = point.data.newData;
+        resizeMap(data.width, data.height);
+
+        const removedTiles = point.data.removedTiles;
+        if(removedTiles && removedTiles.length != 0) {
+            for(var tile of removedTiles) {
+                findTileByPos(tiles, tile.xPos, tile.yPos).type = tile.type;
+            }
+        }
     }
 }
 
