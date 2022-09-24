@@ -8,7 +8,7 @@ wystarczy otworzyć plik index.html za pomocą przeglądarki. <br>
 
 Funkcje aplikacji:
 <ul>
-<li>Ustawianie (left button) i usuwanie (right button) kafelków (maksymalna wielkość mapy to 40x40)</li>
+<li>Ustawianie (left button) i usuwanie (right button) kafelków)</li>
 <li>Przewijanie (trzymanie scroll) i oddalanie/przybliżanie kamery (scroll)</li>
 <li>Kilka rodzajów kafelków oraz możliwość dodawania własnych (folder <i>tiles</i> i plik <i>tiles.js</i>)</li>
 <li>Automatyczne zapisywanie obecnego stanu mapy w pamięci localStorage</li>
