@@ -86,7 +86,7 @@ function fill() {
             }
         }
     }
-    putIntoHistory();
+    putTilesIntoHistory();
     saveTilesObj();
 }
 
@@ -132,7 +132,7 @@ function resizeMap(width, height) {
     
     modifyMapDimension();
     changeMaxLinesPos();
-    
+
     saveTilesObj();
     saveAll();
 }

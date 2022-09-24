@@ -1,26 +1,32 @@
 const history = [];
 var lastModifiedTiles = [];
+var historyPosition = 0;
 
 const EDIT_TILES = 0;
 const EDIT_SPAWN = 1;
 const EDIT_DIMENSION = 2;
 
 function modifyTile(x, y, oldType, newType) {
-    lastModifiedTiles.push({action: EDIT_TILES, xPos: x, yPos: y, oldType, newType});
+    lastModifiedTiles.push({xPos: x, yPos: y, oldType, newType});
 }
 
 function modifySpawn() {
-    console.log("MODIFY SPAWN", spawnTiles);
+    putIntoHistory(EDIT_SPAWN, Array.from(spawnTiles));
 }
 
 function modifyMapDimension() {
-    console.log("RESIZE MAP", mapWidth, mapHeight);
+    putIntoHistory(EDIT_DIMENSION, {width: mapWidth, height: mapHeight});
+}
+
+function putIntoHistory(action, data) {
+    history.unshift({action, data});
+    console.log(history);
 }
 
 const EMPTY_ARRAY = 0;
-function putIntoHistory() {
+function putTilesIntoHistory() {
     if(lastModifiedTiles.length != EMPTY_ARRAY) {
-        console.log("PUT", lastModifiedTiles);
+        putIntoHistory(EDIT_TILES, lastModifiedTiles);
         lastModifiedTiles = [];
     }
 }

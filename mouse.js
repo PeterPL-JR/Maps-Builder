@@ -32,7 +32,7 @@ function mouseUp(event) {
     else if (event.button == MIDDLE_BUTTON) resetMouse();
     else if (event.button == RIGHT_BUTTON) rightClicked = false;
 
-    if((!leftClicked || !rightClicked) && !fMode) putIntoHistory();
+    if((!leftClicked || !rightClicked) && !fMode) putTilesIntoHistory();
 }
 
 function mouseMove(event) {
