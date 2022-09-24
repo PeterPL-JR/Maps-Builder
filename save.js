@@ -31,7 +31,7 @@ function saveAll() {
 function loadAll() {
     cameraX = parseFloat(load("camera_x"));
     cameraY = parseFloat(load("camera_y"));
-    
+
     zoom = parseFloat(load("zoom"));
     activeTile = parseInt(load("active_tile"));
     
@@ -122,5 +122,6 @@ function saveSpawnTilesObj() {
     save("spawn", JSON.stringify(spawnTiles));
 }
 function loadSpawnTilesObj() {
-    return JSON.parse(load("spawn"));
+    const loaded = JSON.parse(load("spawn")); 
+    return loaded != null ? loaded : [];
 }

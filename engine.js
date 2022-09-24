@@ -1,18 +1,20 @@
 function putTile(rawX, rawY) {
-    var tileType = inventory[activeTile];
+    const tileType = inventory[activeTile];
     if(tileType == null) return;
     
     var tile = tiles[findTileIndex(rawX, rawY)];
-    if(tile) {
+    if(tile && tile.type != tileType) {
         tile.type = tileType;
     }
     // put into history
 }
 
 function removeTile(rawX, rawY) {
-    var index = findTileIndex(rawX, rawY);
-    if(index != -1) {
-        tiles[index].type = -1;
+    const index = findTileIndex(rawX, rawY);
+    const tile = tiles[index];
+    
+    if(index != -1 && tile.type != -1) {
+        tile.type = -1;
     }
     // put into history
 }
